@@ -1,0 +1,23 @@
+---
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8.2
+    steps:
+      - checkout
+      - run:
+          command: |
+            sudo pip install pipenv
+            pipenv install --dev
+      - run:
+          command: |
+            pipenv run pytest
+      - run:
+          command: |
+            isort -rc .
+      - run:
+          command: |
+            yapf --style=google -dr .
+
+
