@@ -36,6 +36,12 @@ commands:
           name: make html
           command: |
             pipenv run sphinx-build -a ./docs ./docs/public
+      - run:
+          name: git push
+          command: | 
+            git add -A
+            git commit -m 'updating doc'
+            git push origin HEAD
 
 jobs:
   style_check:
