@@ -82,7 +82,7 @@ def module_level_function(param1, param2=None, *args, **kwargs):
     of each parameter is required. The type and description of each parameter
     is optional, but should be included if not obvious.
 
-    If \*args or \*\*kwargs are accepted,
+    If args or kwargs are accepted,
     they should be listed as ``*args`` and ``**kwargs``.
 
     The format for a parameter is::
@@ -294,3 +294,7 @@ class ExampleClass(object):
 
     def _private_without_docstring(self):
         pass
+
+
+def test_module_level_function():
+    assert module_level_function('test1', 'test2') is True

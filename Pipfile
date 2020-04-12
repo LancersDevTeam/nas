@@ -5,10 +5,10 @@ verify_ssl = true
 
 [dev-packages]
 isort = "*"
-yapf = "*"
 flake8 = "*"
 pytest = "*"
 sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 setuptools = "*"
