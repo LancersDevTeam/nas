@@ -22,3 +22,25 @@ jobs:
       - run:
           command: |
             docs/make html
+
+
+commands:
+  is_docs_update:
+    steps:
+      - run:
+          name: check tests folder is updated
+          command: |
+            if [[ ! $(git diff --diff-filter=d --name-only HEAD | grep tests/ ) = '' ]]; then
+              echo "build and deploy"
+            else
+                echo "deploy not needed for << parameters.pattern >> workflow"
+                circleci step halt
+            fi
+      - run:
+          name: make rst file
+          command: |
+            sphinx-apidoc -F -o docs/ tests/
+      - run:
+          name: make html
+          command: |
+            make html
