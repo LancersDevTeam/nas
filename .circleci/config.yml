@@ -19,5 +19,6 @@ jobs:
       - run:
           command: |
             yapf --style=google -dr .
-
-
+      - run:
+          command: |
+            docs/make html
