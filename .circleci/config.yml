@@ -25,7 +25,7 @@ commands:
             if [[ ! $(git diff --diff-filter=d --name-only HEAD | grep tests/ ) = '' ]]; then
               echo "build and deploy"
             else
-                echo "deploy not needed for << parameters.pattern >> workflow"
+                echo "no need docs update"
                 circleci step halt
             fi
       - run:
@@ -68,11 +68,11 @@ jobs:
 
 workflows:
   basic_workflow:
-    - jobs:
-        - style_check
-        - code_test:
-            requires:
-              - style_check
-        - docs_update:
-            requires:
-              - code_test
+    jobs:
+      - style_check
+      - code_test:
+          requires:
+            - style_check
+      - docs_update:
+          requires:
+            - code_test
