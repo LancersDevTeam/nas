@@ -49,7 +49,7 @@ jobs:
       - run:
           name: check code style
           command: |
-            pipenv run yapf --style=google -dr .
+            pipenv run flake8 .
   
   code_test:
     executor: python-exec
