@@ -38,8 +38,10 @@ commands:
       - run:
           name: git push
           command: | 
+            git config --global user.email oxkeita@gmail.com
+            git config --global user.name odrum428
             git add -A
-            git commit -m 'updating doc'
+            git commit -m 'updating docs [skip ci]'
             git push origin HEAD
 
 jobs:
