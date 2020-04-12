@@ -31,7 +31,7 @@ commands:
       - run:
           name: make rst file
           command: |
-            sphinx-apidoc -F -o docs/ tests/
+            pipenv run sphinx-apidoc -F -o docs/ tests/
       - run:
           name: make html
           command: |
@@ -45,11 +45,11 @@ jobs:
       - run:
           name: check package order
           command: |
-            isort -rc .
+            pipenv run isort -rc .
       - run:
           name: check code style
           command: |
-            yapf --style=google -dr .
+            pipenv run yapf --style=google -dr .
   
   code_test:
     executor: python-exec
