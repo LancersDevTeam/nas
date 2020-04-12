@@ -1,30 +1,22 @@
----
-version: 2
-jobs:
-  build:
+version: 2.1
+
+executors:
+  python-exec:
     docker:
       - image: circleci/python:3.8.2
-    steps:
+    environment:
+        TZ: /usr/share/zoneinfo/Asia/Tokyo
+
+commands:
+  setup_environment:
+    steps:  
       - checkout
       - run:
+          name: set up environment
           command: |
             sudo pip install pipenv
             pipenv install --dev
-      - run:
-          command: |
-            pipenv run pytest
-      - run:
-          command: |
-            isort -rc .
-      - run:
-          command: |
-            yapf --style=google -dr .
-      - run:
-          command: |
-            docs/make html
 
-
-commands:
   is_docs_update:
     steps:
       - run:
@@ -44,3 +36,43 @@ commands:
           name: make html
           command: |
             make html
+
+jobs:
+  style_check:
+    executor: python-exec
+    steps:
+      - setup_environment
+      - run:
+          name: check package order
+          command: |
+            isort -rc .
+      - run:
+          name: check code style
+          command: |
+            yapf --style=google -dr .
+  
+  code_test:
+    executor: python-exec
+    steps:
+      - setup_environment
+      - run:
+          name: run pytest
+          command: |
+            pipenv run pytest
+
+  docs_update:
+    executor: python-exec
+    steps:
+      - setup_environment
+      - is_docs_update
+
+workflows:
+  basic_workflow:
+    - jobs:
+        - style_check
+        - code_test:
+            requires:
+              - style_check
+        - docs_update:
+            requires:
+              - code_test
