@@ -10,7 +10,7 @@ They have also implemented a basic CI using CircleCI.
 1. Create a GitHub repository.
 
 This time, I created a repository called new_project.
-https://user-images.githubusercontent.com/33741792/79072902-785be280-7d1e-11ea-9758-a5aa6ebbbdc9.png
+![image](https://user-images.githubusercontent.com/33741792/79072902-785be280-7d1e-11ea-9758-a5aa6ebbbdc9.png)
 
 2. Start a new project based on this repository
 ```
