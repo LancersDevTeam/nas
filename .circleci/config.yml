@@ -26,6 +26,7 @@ commands:
               echo "build and deploy"
             else
                 echo "no need docs update"
+                circleci step halt
             fi
       - run:
           name: make rst file
