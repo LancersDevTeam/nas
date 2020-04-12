@@ -1,5 +1,3 @@
-import pytest
-
 """Example Google style docstrings.
 
 This module demonstrates documentation as specified by the `Google Python
@@ -33,6 +31,8 @@ Todo:
 http://google.github.io/styleguide/pyguide.html
 
 """
+
+
 def module_level_function(param1, param2=None, *args, **kwargs):
     """This is an example of a module level function.
 
@@ -86,5 +86,6 @@ def module_level_function(param1, param2=None, *args, **kwargs):
         raise ValueError('param1 may not be equal to param2')
     return True
 
+
 def test_module_level_function():
-    assert module_level_function('test1', 'test2') == True
+    assert module_level_function('test1', 'test2') is True
