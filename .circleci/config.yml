@@ -31,11 +31,11 @@ commands:
       - run:
           name: make rst file
           command: |
-            pipenv run sphinx-apidoc -F -o docs/ tests/
+            pipenv run sphinx-apidoc -f -o docs/ tests/
       - run:
           name: make html
           command: |
-            make html
+            pipenv run sphinx-build -a ./docs ./docs/public
 
 jobs:
   style_check:
