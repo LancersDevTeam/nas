@@ -8,6 +8,7 @@ isort = "*"
 flake8 = "*"
 pytest = "*"
 sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 setuptools = "*"
