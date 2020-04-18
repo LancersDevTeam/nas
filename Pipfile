@@ -9,6 +9,7 @@ flake8 = "*"
 pytest = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
+v = {editable = true,version = "*"}
 
 [packages]
 setuptools = "*"
