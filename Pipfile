@@ -12,6 +12,9 @@ sphinx-rtd-theme = "*"
 
 [packages]
 setuptools = "*"
+numpy = "*"
+requests = "*"
+pytz = "*"
 
 [requires]
 python_version = "3.8"
