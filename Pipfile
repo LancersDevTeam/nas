@@ -10,6 +10,7 @@ pytest = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 v = {editable = true,version = "*"}
+moto = "*"
 
 [packages]
 setuptools = "*"
