@@ -9,9 +9,13 @@ flake8 = "*"
 pytest = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
+v = {editable = true,version = "*"}
 
 [packages]
 setuptools = "*"
+numpy = "*"
+requests = "*"
+pytz = "*"
 
 [requires]
 python_version = "3.8"
