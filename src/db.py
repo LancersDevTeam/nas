@@ -1,11 +1,7 @@
-import os
-
 import boto3
 from boto3.dynamodb.conditions import Key
-from utils import get_ref_timestamp
 
-# Reading the lambda environment variable
-NAS_SEND_LIMIT = int(os.envirion["TIP_LIMIT"])
+from .utils import get_ref_timestamp
 
 
 def load_send_nas_num(user_id):
