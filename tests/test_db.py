@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 
 import boto3
 from moto import mock_dynamodb2
 
 from src.db import load_send_nas_num
+from src.utils import get_ref_timestamp
 
 sys.path.append('../')
 
@@ -21,6 +22,7 @@ def test_load_send_nas_num():
 
     Args:
         user_id : slack user_id
+        ref_timestamp : Criteria for obtaining a timestamp greater than this
 
     Returns:
         int : target user sended nas in this week
@@ -59,13 +61,10 @@ def test_load_send_nas_num():
 
     # create sample timestamp
     now = datetime.now()
-    format_ref_date = datetime(now.year, now.month, now.day, 0, 0, 0)
-    add_one_day = timedelta(days=1)
-    test_time_stamp = format_ref_date + add_one_day
 
     nas = {
         'tip_user_id': 'test_user_A',
-        'time_stamp': Decimal(test_time_stamp.timestamp()),
+        'time_stamp': Decimal(now.timestamp()),
         'receive_user_id': 'test_user_B',
         'receive_user_name': 'test_user_B',
         'tip_type': 'stamp',
@@ -73,6 +72,7 @@ def test_load_send_nas_num():
         'team_id': 'test_team'
     }
     nas_table.put_item(Item=nas)
+    ref_timestamp = get_ref_timestamp()
 
-    assert load_send_nas_num('test_user_A') == 1
-    assert load_send_nas_num('test_user_B') == 0
+    assert load_send_nas_num('test_user_A', ref_timestamp) == 1
+    assert load_send_nas_num('test_user_B', ref_timestamp) == 0

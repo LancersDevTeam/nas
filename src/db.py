@@ -1,11 +1,8 @@
 import boto3
 from boto3.dynamodb.conditions import Key
 
-from .utils import get_ref_timestamp
 
-
-def load_send_nas_num(user_id):
-    ref_timestamp = get_ref_timestamp()
+def load_send_nas_num(user_id, ref_timestamp):
     try:
         dynamoDB = boto3.resource('dynamodb')
         table = dynamoDB.Table('NAS')
