@@ -28,7 +28,8 @@ def test_get_ref_timestamp():
 
 def test_get_last_week_ref_timestamp():
     """Get last week's reference time stamp
-    As a basic feature of NAS, depending on how many NAS you received last week, the more NAS you can send that week.
+    A basic feature of NAS is the BONUS feature, which increases the number of NAS 
+    you can send in a week according to the number of NAS you sent last week.
     To calculate that, I created a function to get a reference timestamp for the last week
 
     In the test case, the function is used to get a reference timestamp and check if it matches.
