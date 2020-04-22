@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-import os
 import sys
 from datetime import datetime
 from decimal import Decimal
-
-import boto3
-from moto import mock_dynamodb2
 
 from src.db import load_send_nas_num
 from src.utils import get_ref_timestamp
@@ -13,8 +9,7 @@ from src.utils import get_ref_timestamp
 sys.path.append('../')
 
 
-@mock_dynamodb2
-def test_load_send_nas_num():
+def test_load_send_nas_num(nas_db):
     """Retrieve the NAS records of the week created by the target user
     The NAS uses a week as a basic unit.
     The NAS, which can be sent every week, is reset and a ranking for the week is created.
@@ -28,38 +23,6 @@ def test_load_send_nas_num():
         int : target user sended nas in this week
     """
 
-    os.environ['AWS_DEFAULT_REGION'] = 'ap-northeast-1'
-    dynamoDB = boto3.resource('dynamodb')
-    dynamoDB.create_table(
-        TableName='NAS',
-        AttributeDefinitions=[
-            {
-                'AttributeName': 'tip_user_id',
-                'AttributeType': 'S'
-            },
-            {
-                'AttributeName': 'time_stamp',
-                'AttributeType': 'N'
-            }
-        ],
-        KeySchema=[
-            {
-                'AttributeName': 'tip_user_id',
-                'KeyType': 'HASH'
-            },
-            {
-                'AttributeName': 'time_stamp',
-                'KeyType': 'RANGE'
-            },
-        ],
-        ProvisionedThroughput={
-            'ReadCapacityUnits': 15,
-            'WriteCapacityUnits': 5,
-        }
-    )
-    nas_table = dynamoDB.Table('NAS')
-
-    # create sample timestamp
     now = datetime.now()
 
     nas = {
@@ -71,7 +34,7 @@ def test_load_send_nas_num():
         'tip_user_name': 'test_user_A',
         'team_id': 'test_team'
     }
-    nas_table.put_item(Item=nas)
+    nas_db.put_item(Item=nas)
     ref_timestamp = get_ref_timestamp()
 
     assert load_send_nas_num('test_user_A', ref_timestamp) == 1
