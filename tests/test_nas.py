@@ -99,3 +99,19 @@ class TestNas():
         }
         nas_db.put_item(Item=nas_past)
         assert nas_obj.nas_status() == 30
+
+    def test_chack_self_portrait(self):
+        """Check to see if you're sending yourself an NAS
+        Since NAS is a tool for expressing gratitude to others, you can't send it to yourself.
+        Check whether the sender's user_id and the destination's user_id are the same.
+
+        Args:
+            receive_user_id: The slack user_id of the destination
+
+        Return:
+            bool : True if it was sent to yourself.False otherwise
+        """
+
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.chack_self_portrait('test_user_A_id') is True
+        assert nas_obj.chack_self_portrait('test_user_B_id') is False

@@ -30,3 +30,8 @@ class Nas:
         nas_bonus = self.nas_bonus()
         remain_nas = (NAS_LIMIT - sended_nas) + nas_bonus
         return remain_nas
+
+    def chack_self_portrait(self, receive_user_id):
+        if self.user_id == receive_user_id:
+            return True
+        return False
