@@ -9,9 +9,10 @@ NAS_LIMIT = int(os.environ['NAS_LIMIT'])
 
 
 class Nas:
-    def __init__(self, user_id, user_name):
+    def __init__(self, user_id, user_name, team_id):
         self.user_id = user_id
         self.user_name = user_name
+        self.team_id = team_id
 
     def nas_bonus(self):
         this_week_ref_timestamp = get_ref_timestamp()

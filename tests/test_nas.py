@@ -21,6 +21,7 @@ class TestNas():
     Attributes:
         user_id: The user who sent the NAS Slack user id.
         user_name: The user who sent the NAS Slack user name.
+        team_id: The user who sent the NAS Slack team id.
     """
 
     def test_nas_bonus(self, nas_db):
@@ -32,7 +33,7 @@ class TestNas():
         By default, 20% of the NAS you send will be granted as a bonus.
         """
 
-        nas_obj = Nas('test_user_A_id', 'test_user_A_name')
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
         assert nas_obj.nas_bonus() == 0
 
         now = datetime.now()
@@ -70,7 +71,7 @@ class TestNas():
         Returns:
             int : remain nas num
         """
-        nas_obj = Nas('test_user_A_id', 'test_user_A_name')
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
         assert nas_obj.nas_status() == 30
 
         now = datetime.now()
