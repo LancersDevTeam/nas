@@ -115,3 +115,29 @@ class TestNas():
         nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
         assert nas_obj.chack_self_portrait('test_user_A_id') is True
         assert nas_obj.chack_self_portrait('test_user_B_id') is False
+
+    def test_check_can_send_nas(self, nas_db):
+        """Check to see if user can send the NAS
+        Check to see if the target user has more than 0 NAS. And that includes the BONUS portion.
+
+        Return:
+            bool : can send is True. can't send is False.
+        """
+
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.check_can_send_nas() is True
+
+        for i in range(30):
+            now = datetime.now()
+            nas_now = {
+                'tip_user_id': 'test_user_A_id',
+                'time_stamp': Decimal(now.timestamp()),
+                'receive_user_id': 'test_user_B_id',
+                'receive_user_name': 'test_user_B_name',
+                'tip_type': 'stamp',
+                'tip_user_name': 'test_user_A_name',
+                'team_id': 'test_team_id'
+            }
+            nas_db.put_item(Item=nas_now)
+
+        assert nas_obj.check_can_send_nas() is False

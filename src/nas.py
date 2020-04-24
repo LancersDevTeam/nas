@@ -35,3 +35,9 @@ class Nas:
         if self.user_id == receive_user_id:
             return True
         return False
+
+    def check_can_send_nas(self):
+        print(self.nas_status())
+        if self.nas_status() > 0:
+            return True
+        return False
