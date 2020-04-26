@@ -3,8 +3,6 @@ import os
 
 import requests
 
-os.environ['NAS_LIMIT']
-
 
 def post_public_message_to_slack(send_message, slack_channel_name):
     slack_bot_token = "Bearer {0}".format(os.environ['SLACK_BOT_USER_ACCESS_TOKEN'])
