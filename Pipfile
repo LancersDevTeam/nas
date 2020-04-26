@@ -12,6 +12,7 @@ sphinx-rtd-theme = "*"
 v = {editable = true,version = "*"}
 moto = "*"
 pytest-mock = "*"
+pytest-env = "*"
 
 [packages]
 setuptools = "*"
