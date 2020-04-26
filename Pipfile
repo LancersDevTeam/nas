@@ -11,6 +11,7 @@ sphinx = "*"
 sphinx-rtd-theme = "*"
 v = {editable = true,version = "*"}
 moto = "*"
+pytest-mock = "*"
 
 [packages]
 setuptools = "*"
