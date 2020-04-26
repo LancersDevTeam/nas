@@ -17,6 +17,7 @@ setuptools = "*"
 numpy = "*"
 requests = "*"
 pytz = "*"
+configparser = "*"
 
 [requires]
 python_version = "3.8"

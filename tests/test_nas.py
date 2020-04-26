@@ -21,6 +21,7 @@ class TestNas():
     Attributes:
         user_id: The user who sent the NAS Slack user id.
         user_name: The user who sent the NAS Slack user name.
+        team_id: The user who sent the NAS Slack team id.
     """
 
     def test_nas_bonus(self, nas_db):
@@ -32,7 +33,7 @@ class TestNas():
         By default, 20% of the NAS you send will be granted as a bonus.
         """
 
-        nas_obj = Nas('test_user_A_id', 'test_user_A_name')
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
         assert nas_obj.nas_bonus() == 0
 
         now = datetime.now()
@@ -70,7 +71,7 @@ class TestNas():
         Returns:
             int : remain nas num
         """
-        nas_obj = Nas('test_user_A_id', 'test_user_A_name')
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
         assert nas_obj.nas_status() == 30
 
         now = datetime.now()
@@ -98,3 +99,67 @@ class TestNas():
         }
         nas_db.put_item(Item=nas_past)
         assert nas_obj.nas_status() == 30
+
+    def test_chack_self_portrait(self):
+        """Check to see if you're sending yourself an NAS
+        Since NAS is a tool for expressing gratitude to others, you can't send it to yourself.
+        Check whether the sender's user_id and the destination's user_id are the same.
+
+        Args:
+            receive_user_id: The slack user_id of the destination
+
+        Return:
+            bool : True if it was sent to yourself.False otherwise
+        """
+
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.chack_self_portrait('test_user_A_id') is True
+        assert nas_obj.chack_self_portrait('test_user_B_id') is False
+
+    def test_check_can_send_nas(self, nas_db):
+        """Check to see if user can send the NAS
+        Check to see if the target user has more than 0 NAS. And that includes the BONUS portion.
+
+        Return:
+            bool : can send is True. can't send is False.
+        """
+
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.check_can_send_nas() is True
+
+        for i in range(30):
+            now = datetime.now()
+            nas_now = {
+                'tip_user_id': 'test_user_A_id',
+                'time_stamp': Decimal(now.timestamp()),
+                'receive_user_id': 'test_user_B_id',
+                'receive_user_name': 'test_user_B_name',
+                'tip_type': 'stamp',
+                'tip_user_name': 'test_user_A_name',
+                'team_id': 'test_team_id'
+            }
+            nas_db.put_item(Item=nas_now)
+
+        assert nas_obj.check_can_send_nas() is False
+
+    def test_nas_stamp(self):
+        """Sending nas with a Slack stamp
+        One of the main ways to send NAS.
+        By stamping a specific Slack stamp, you can send a NAS to the stamped user.
+        This function only checks the stamp and creates a record.
+        Therefore, the return value takes the bool value of whether the stamp was successfully sent or not.
+        Also, the stamps are culled out of the settings only in stamp_config.ini so that each can set their own stamp freely.
+        Set the target stamp name to the section name. By default, it is set to eggplant.
+
+        Args:
+            receive_user_id: The slack user_id of the destination
+            receive_user_name : The slack user_name of the destination
+            stamp_name : A user sended stamp name
+
+        Return:
+            bool : is the stamp sent successfully. success is True. Fail is False.
+        """
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.nas_stamp('test_user_B_id', 'test_user_B_name', 'eggplant') is True
+
+        assert nas_obj.nas_stamp('test_user_B_id', 'test_user_B_name', 'some_stamp') is False

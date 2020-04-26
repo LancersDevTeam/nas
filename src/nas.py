@@ -2,16 +2,22 @@
 import math
 import os
 
-from .db import load_send_nas_num
+from .db import load_send_nas_num, create_nas_record
 from .utils import get_last_week_ref_timestamp, get_ref_timestamp
+
+from configparser import ConfigParser, ExtendedInterpolation
+
+STAMP_CONFIG = ConfigParser(interpolation=ExtendedInterpolation())
+STAMP_CONFIG.read('./src/stamp_config.ini')
+
 
 NAS_LIMIT = int(os.environ['NAS_LIMIT'])
 
-
 class Nas:
-    def __init__(self, user_id, user_name):
+    def __init__(self, user_id, user_name, team_id):
         self.user_id = user_id
         self.user_name = user_name
+        self.team_id = team_id
 
     def nas_bonus(self):
         this_week_ref_timestamp = get_ref_timestamp()
@@ -29,3 +35,32 @@ class Nas:
         nas_bonus = self.nas_bonus()
         remain_nas = (NAS_LIMIT - sended_nas) + nas_bonus
         return remain_nas
+
+    def chack_self_portrait(self, receive_user_id):
+        if self.user_id == receive_user_id:
+            return True
+        return False
+
+    def check_can_send_nas(self):
+        if self.nas_status() > 0:
+            return True
+        return False
+
+    def nas_stamp(self, receive_user_id, receive_user_name, stamp_name):
+        if self.chack_self_portrait(receive_user_id) is True:
+            print('self_portrait')
+            return False
+
+        if self.check_can_send_nas() is False:
+            print('nas send limit')
+            return False
+
+        if STAMP_CONFIG.has_section(stamp_name) is False:
+            print('this is not nas stamp')
+            return False
+
+        send_nas_num = STAMP_CONFIG.get(stamp_name, 'nas_num')
+        for i in range(int(send_nas_num)):
+            create_nas_record(self.user_id, self.user_name, receive_user_id, receive_user_name, 'stamp', self.team_id)
+
+        return True

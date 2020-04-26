@@ -1,3 +1,6 @@
+from datetime import datetime
+from decimal import Decimal
+
 import boto3
 from boto3.dynamodb.conditions import Key
 
@@ -15,3 +18,25 @@ def load_send_nas_num(user_id, ref_timestamp):
     except Exception as e:
         print(e)
         return 0
+
+
+def create_nas_record(nas_user_id, nas_user_name, receive_user_id, receive_user_name, nas_type, team_id):
+    try:
+        dynamoDB = boto3.resource('dynamodb')
+        nas_table = dynamoDB.Table('NAS')
+
+        nas_table.put_item(
+            Item={
+                'tip_user_id': nas_user_id,
+                'time_stamp': Decimal(datetime.now().timestamp()),
+                'tip_user_name': nas_user_name,
+                'receive_user_id': receive_user_id,
+                'receive_user_name': receive_user_name,
+                'tip_type': nas_type,
+                'team_id': team_id
+            }
+        )
+        return True
+    except Exception as e:
+        print(e)
+        return False
