@@ -141,3 +141,25 @@ class TestNas():
             nas_db.put_item(Item=nas_now)
 
         assert nas_obj.check_can_send_nas() is False
+
+    def test_nas_stamp(self):
+        """Sending nas with a Slack stamp
+        One of the main ways to send NAS.
+        By stamping a specific Slack stamp, you can send a NAS to the stamped user.
+        This function only checks the stamp and creates a record.
+        Therefore, the return value takes the bool value of whether the stamp was successfully sent or not.
+        Also, the stamps are culled out of the settings only in stamp_config.ini so that each can set their own stamp freely.
+        Set the target stamp name to the section name. By default, it is set to eggplant.
+
+        Args:
+            receive_user_id: The slack user_id of the destination
+            receive_user_name : The slack user_name of the destination
+            stamp_name : A user sended stamp name
+
+        Return:
+            bool : is the stamp sent successfully. success is True. Fail is False.
+        """
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.nas_stamp('test_user_B_id', 'test_user_B_name', 'eggplant') is True
+
+        assert nas_obj.nas_stamp('test_user_B_id', 'test_user_B_name', 'some_stamp') is False
