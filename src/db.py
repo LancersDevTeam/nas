@@ -20,6 +20,28 @@ def load_send_nas_num(user_id, ref_timestamp):
         return 0
 
 
+def scan_nas_records(ref_timestamp):
+    try:
+        dynamoDB = boto3.resource('dynamodb')
+        table = dynamoDB.Table('NAS')
+
+        response = table.scan(
+            FilterExpression=Key('time_stamp').gt(ref_timestamp)
+        )
+        nas_records = response['Items']
+
+        while 'LastEvaluatedKey' in response:
+            response = table.scan(
+                FilterExpression=Key('time_stamp').gt(ref_timestamp),
+                ExclusiveStartKey=response['LastEvaluatedKey']
+            )
+            nas_records.extend(response['Items'])
+        return nas_records
+    except Exception as e:
+        print(e)
+        return []
+
+
 def create_nas_record(nas_user_id, nas_user_name, receive_user_id, receive_user_name, nas_type, team_id):
     try:
         dynamoDB = boto3.resource('dynamodb')
