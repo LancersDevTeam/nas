@@ -163,3 +163,23 @@ class TestNas():
         assert nas_obj.nas_stamp('test_user_B_id', 'test_user_B_name', 'eggplant') is True
 
         assert nas_obj.nas_stamp('test_user_B_id', 'test_user_B_name', 'some_stamp') is False
+
+    def test_nas_message(self):
+        """Send the NAS with a message.
+        Send the NAS with a message.
+        A method to send a NAS with a prepackaged message using the nas_message command.
+        In this section, we go as far as making a record.
+        Sending a message is done by another function.
+        Therefore, the return value is the bool value of whether the NAS transmission was successful or not.
+
+        Args:
+            receive_user_id: The slack user_id of the destination
+            receive_user_name : The slack user_name of the destination
+
+        Return:
+            bool : is the nas sent successfully. success is True. Fail is False.
+        """
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.nas_message('test_user_B_id', 'test_user_B_name') is True
+
+        assert nas_obj.nas_message('test_user_A_id', 'test_user_A_name') is False

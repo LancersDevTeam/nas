@@ -1,17 +1,17 @@
 # nasクラスを作る。
 import math
 import os
-
-from .db import load_send_nas_num, create_nas_record
-from .utils import get_last_week_ref_timestamp, get_ref_timestamp
-
 from configparser import ConfigParser, ExtendedInterpolation
+
+from .db import create_nas_record, load_send_nas_num
+from .utils import get_last_week_ref_timestamp, get_ref_timestamp
 
 STAMP_CONFIG = ConfigParser(interpolation=ExtendedInterpolation())
 STAMP_CONFIG.read('./src/stamp_config.ini')
 
 
 NAS_LIMIT = int(os.environ['NAS_LIMIT'])
+
 
 class Nas:
     def __init__(self, user_id, user_name, team_id):
@@ -63,4 +63,16 @@ class Nas:
         for i in range(int(send_nas_num)):
             create_nas_record(self.user_id, self.user_name, receive_user_id, receive_user_name, 'stamp', self.team_id)
 
+        return True
+
+    def nas_message(self, receive_user_id, receive_user_name):
+        if self.chack_self_portrait(receive_user_id) is True:
+            print('self_portrait')
+            return False
+
+        if self.check_can_send_nas() is False:
+            print('nas send limit')
+            return False
+
+        create_nas_record(self.user_id, self.user_name, receive_user_id, receive_user_name, 'message', self.team_id)
         return True
