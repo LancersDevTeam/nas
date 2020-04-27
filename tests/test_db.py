@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 from decimal import Decimal
 
-from src.db import create_nas_record, load_send_nas_num
+from src.db import create_nas_record, load_send_nas_num, scan_nas_records
 from src.utils import get_ref_timestamp
 
 sys.path.append('../')
@@ -39,6 +39,38 @@ def test_load_send_nas_num(nas_db):
 
     assert load_send_nas_num('test_user_A', ref_timestamp) == 1
     assert load_send_nas_num('test_user_B', ref_timestamp) == 0
+
+
+def test_scan_nas_records(nas_db):
+    """Use SCAN to retrieve all NAS records created prior to the specified period.
+    The query function can only get the hash key and the set, so we use scan.
+    In addition, as a characteristic of scanning dynamo db,
+    the upper limit of one acquisition is 1MB.
+    For this reason, it is not possible to obtain all the data in just one acquisition.
+    Therefore, the process is such that it starts the next acquisition from
+    the last key acquired last time and does not finish until all the keys have been acquired.
+
+    Args:
+        ref_timestamp : Criteria for obtaining a timestamp greater than this
+
+    Return:
+        list : nas record list
+    """
+    now = datetime.now()
+
+    nas = {
+        'tip_user_id': 'test_user_A',
+        'time_stamp': Decimal(now.timestamp()),
+        'receive_user_id': 'test_user_B',
+        'receive_user_name': 'test_user_B',
+        'tip_type': 'stamp',
+        'tip_user_name': 'test_user_A',
+        'team_id': 'test_team'
+    }
+    nas_db.put_item(Item=nas)
+    ref_timestamp = get_ref_timestamp()
+
+    assert scan_nas_records(ref_timestamp)[0] == nas
 
 
 def test_create_nas_record(nas_db):
