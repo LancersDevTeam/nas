@@ -62,3 +62,23 @@ def create_nas_record(nas_user_id, nas_user_name, receive_user_id, receive_user_
     except Exception as e:
         print(e)
         return False
+
+
+def create_nas_gacha_record(gacha_user_id, time_stamp, has_nas_num, used_nas_num, has_tickets):
+    try:
+        dynamoDB = boto3.resource('dynamodb')
+        nas_gacha_table = dynamoDB.Table('NAS_GACHA')
+
+        nas_gacha_table.put_item(
+            Item={
+                'user_id': gacha_user_id,
+                'time_stamp': time_stamp,
+                'has_nas_num': has_nas_num,
+                'used_nas_num': used_nas_num,
+                'has_tickets': has_tickets
+            }
+        )
+        return True
+    except Exception as e:
+        print(e)
+        return False
