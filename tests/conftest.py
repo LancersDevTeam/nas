@@ -53,21 +53,13 @@ def nas_gacha_db():
                 {
                     'AttributeName': 'user_id',
                     'AttributeType': 'S'
-                },
-                {
-                    'AttributeName': 'time_stamp',
-                    'AttributeType': 'N'
                 }
             ],
             KeySchema=[
                 {
                     'AttributeName': 'user_id',
                     'KeyType': 'HASH'
-                },
-                {
-                    'AttributeName': 'time_stamp',
-                    'KeyType': 'RANGE'
-                },
+                }
             ],
             ProvisionedThroughput={
                 'ReadCapacityUnits': 5,
