@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 from decimal import Decimal
 
-from src.db import create_nas_record, load_send_nas_num, scan_nas_records, create_nas_gacha_record
+from src.db import create_nas_record, load_send_nas_num, scan_nas_records, create_nas_gacha_record, load_latest_nas_gacha_record
 from src.utils import get_ref_timestamp
 
 sys.path.append('../')
@@ -94,6 +94,45 @@ def test_create_nas_record(nas_db):
     assert load_send_nas_num('test_user_A_id', ref_timestamp) == 1
 
     assert load_send_nas_num('test_user_B_id', ref_timestamp) == 0
+
+
+def test_load_latest_nas_gacha_record(nas_gacha_db):
+    """Retrieve the latest record of the target user.
+    The user record in nas_gacha is the most recent record representing the most recent state.
+    Along with that, when creating a new record or wanting to know the status of the user,
+    it is necessary to get the latest record.
+    This function does not return the contents of the record, but gets all the latest records.
+
+    Args:
+        gacha_user_id : The id of the user who wants to retrieve the latest record.
+
+    Return:
+        dict : latest record.
+    """
+
+    assert load_latest_nas_gacha_record('test_user_A_id') == {}
+
+    now = datetime.now()
+    create_nas_gacha_record('test_user_A_id', Decimal(now.timestamp()), 10, 0, {})
+    nas_gacha_record = {
+        'user_id': 'test_user_A_id',
+        'time_stamp': Decimal(now.timestamp()),
+        'has_nas_num': 10,
+        'used_nas_num': 0,
+        'has_tickets': {}
+    }
+    assert load_latest_nas_gacha_record('test_user_A_id') == nas_gacha_record
+
+    now = datetime.now()
+    create_nas_gacha_record('test_user_A_id', Decimal(now.timestamp()), 0, 10, {})
+    nas_gacha_record = {
+        'user_id': 'test_user_A_id',
+        'time_stamp': Decimal(now.timestamp()),
+        'has_nas_num': 0,
+        'used_nas_num': 10,
+        'has_tickets': {}
+    }
+    assert load_latest_nas_gacha_record('test_user_A_id') == nas_gacha_record
 
 
 def test_create_nas_gacha_record(nas_gacha_db):
