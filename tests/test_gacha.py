@@ -18,6 +18,7 @@ def test_select_prize():
     prizes = ['prize_1', 'prize_2', 'prize_3', 'prize_4', 'prize_5']
     assert select_prize() in prizes
 
+
 def test_roll_a_gacha():
     """Gacha spinning function
     Turn the gacha based on a predetermined probability.
