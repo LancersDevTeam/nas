@@ -3,8 +3,9 @@ import sys
 import time
 from datetime import datetime
 from decimal import Decimal
+import json
 
-from src.utils import get_last_week_ref_timestamp, get_ref_timestamp, calc_nas_ranking_this_week
+from src.utils import get_last_week_ref_timestamp, get_ref_timestamp, calc_nas_ranking_this_week, bring_slack_id_from_slack_name
 
 sys.path.append('../')
 
@@ -92,3 +93,20 @@ def test_calc_nas_ranking_this_week(nas_db):
         'test_user_C_name': 2
     }
     assert calc_nas_ranking_this_week() == estimate_nas_ranking
+
+
+def test_bring_slack_id_from_slack_name(mocker):
+    """Get the slack_user_name from the slack_user_id
+    There are cases in which it is not possible to get enough information about the destination party, etc., in running the NAS.
+    In that case, use the slack api to get the user_name directly from the group's user list.
+
+    Return:
+        str: slack user name
+    """
+    # Create fake response
+    responseMock = mocker.Mock()
+    responseMock.status_code = 200
+    responseMock.text = json.dumps({'test_user_B_id': 'test_user_B_name'})
+
+    mocker.patch('requests.get').return_value = responseMock
+    assert bring_slack_id_from_slack_name('test_user_Z_id') == ''
