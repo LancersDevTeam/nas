@@ -41,3 +41,14 @@ def calc_nas_ranking_this_week():
     ranking_source = Counter(receive_user_list)
     receive_users, nas_counts = zip(*ranking_source.most_common())
     return dict(zip(receive_users, nas_counts))
+
+
+def parse_lambda_event_str(lambda_event_obj):
+    content_body = lambda_event_obj['body'].split('&')
+    parsed_dict = {}
+    for param in content_body:
+        content_separate_index = param.find('=')
+        content_key = param[:content_separate_index]
+        content_value = param[content_separate_index+1:]
+        parsed_dict[content_key] = content_value
+    return parsed_dict
