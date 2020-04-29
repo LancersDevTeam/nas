@@ -270,3 +270,13 @@ class TestNas():
             }
             nas_db.put_item(Item=nas_item)
         assert nas_obj_A.check_can_run_gacha() is True
+
+    def test_nas_gacha(self, nas_gacha_db):
+        """Function to roll Gacha and write the result
+        This function is used when the Gacha command is executed.
+        Gacha is designed so that the first time you play it, it's free.
+        The cost of one turn is 10 NAS received from someone else.
+        If you want to roll a gacha, you'll need to get an NAS from someone else.
+        """
+        nas_obj_A = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj_A.nas_gacha() is True
