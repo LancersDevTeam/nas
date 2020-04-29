@@ -64,6 +64,29 @@ class TestNas():
         nas_db.put_item(Item=nas_past)
         assert nas_obj.nas_bonus() == 1
 
+    def test_sended_nas_num(self, nas_db):
+        """Get the number of NAS's you've used this week
+        Since the beginning of the week, I tally the number of NAS that I have sent to other users.
+
+        return:
+            int : sended nas num
+        """
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.sended_nas_num() == 0
+
+        now = datetime.now()
+        nas = {
+            'tip_user_id': 'test_user_A_id',
+            'time_stamp': Decimal(now.timestamp()),
+            'receive_user_id': 'test_user_B_id',
+            'receive_user_name': 'test_user_B_name',
+            'tip_type': 'stamp',
+            'tip_user_name': 'test_user_A_name',
+            'team_id': 'test_team_id'
+        }
+        nas_db.put_item(Item=nas)
+        assert nas_obj.sended_nas_num() == 1
+
     def test_nas_status(self, nas_db):
         """Check the number of NAS you have left
         The number of NAS you can send in a week is determined by the number of NAS you can send in a week.
