@@ -1,16 +1,19 @@
 # nasクラスを作る。
 import math
 import os
+from decimal import Decimal
+from datetime import datetime
 from configparser import ConfigParser, ExtendedInterpolation
 
-from .db import create_nas_record, load_send_nas_num
+from .db import create_nas_record, load_send_nas_num, scan_user_receive_nas_num, load_latest_nas_gacha_record, create_nas_gacha_record
 from .utils import get_last_week_ref_timestamp, get_ref_timestamp
+from .gacha import roll_a_gacha
 
 STAMP_CONFIG = ConfigParser(interpolation=ExtendedInterpolation())
 STAMP_CONFIG.read('./src/stamp_config.ini')
 
-
 NAS_LIMIT = int(os.environ['NAS_LIMIT'])
+NAS_GACHA_COST = int(os.environ['NAS_GACHA_COST'])
 
 
 class Nas:
@@ -75,4 +78,40 @@ class Nas:
             return False
 
         create_nas_record(self.user_id, self.user_name, receive_user_id, receive_user_name, 'message', self.team_id)
+        return True
+
+    def check_can_run_gacha(self):
+        all_receive_nas_num = scan_user_receive_nas_num(self.user_id)
+        latest_nas_gacha_record = load_latest_nas_gacha_record(self.user_id)
+        if latest_nas_gacha_record == {}:
+            return True
+        already_used_nas_num = int(latest_nas_gacha_record['used_nas_num']) + NAS_GACHA_COST
+
+        if already_used_nas_num >= all_receive_nas_num:
+            print(all_receive_nas_num)
+            return False
+
+        return True
+
+    def nas_gacha(self):
+        if self.check_can_run_gacha() is False:
+            return False
+
+        now = datetime.now()
+        all_receive_nas_num = scan_user_receive_nas_num(self.user_id)
+        latest_nas_gacha_record = load_latest_nas_gacha_record(self.user_id)
+
+        gacha_result = roll_a_gacha()
+        if latest_nas_gacha_record == {}:
+            already_used_nas_num = 0
+            has_tickets = {}
+            if gacha_result != '':
+                has_tickets[gacha_result] = 1
+        else:
+            already_used_nas_num = int(latest_nas_gacha_record['used_nas_num']) + NAS_GACHA_COST
+            has_tickets = latest_nas_gacha_record['has_tickets']
+            if gacha_result != '':
+                has_tickets[gacha_result] = has_tickets.get(gacha_result, 0) + 1
+
+        create_nas_gacha_record(self.user_id, Decimal(now.timestamp()), all_receive_nas_num, already_used_nas_num, has_tickets)
         return True

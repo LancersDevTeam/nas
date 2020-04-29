@@ -62,3 +62,65 @@ def create_nas_record(nas_user_id, nas_user_name, receive_user_id, receive_user_
     except Exception as e:
         print(e)
         return False
+
+
+def scan_user_receive_nas_num(scan_user_id):
+    try:
+        dynamoDB = boto3.resource('dynamodb')
+        table = dynamoDB.Table('NAS')
+
+        response = table.scan(
+            FilterExpression=Key('receive_user_id').eq(scan_user_id)
+        )
+        nas_records = response['Items']
+
+        while 'LastEvaluatedKey' in response:
+            response = table.scan(
+                FilterExpression=Key('receive_user_id').eq(scan_user_id),
+                ExclusiveStartKey=response['LastEvaluatedKey']
+            )
+            nas_records.extend(response['Items'])
+
+        return len(nas_records)
+    except Exception as e:
+        print(e)
+        return 0
+
+
+def load_latest_nas_gacha_record(gacha_user_id):
+    try:
+        dynamoDB = boto3.resource('dynamodb')
+        table = dynamoDB.Table('NAS_GACHA')
+
+        nas_gacha_records = table.query(
+            KeyConditionExpression=Key('user_id').eq(gacha_user_id)
+        )
+
+        latest_nas_record = max(nas_gacha_records["Items"], key=(lambda x: x["time_stamp"]))
+        print(latest_nas_record)
+        print(type(latest_nas_record))
+
+        return latest_nas_record
+    except Exception as e:
+        print(e)
+        return {}
+
+
+def create_nas_gacha_record(gacha_user_id, time_stamp, has_nas_num, used_nas_num, has_tickets):
+    try:
+        dynamoDB = boto3.resource('dynamodb')
+        nas_gacha_table = dynamoDB.Table('NAS_GACHA')
+
+        nas_gacha_table.put_item(
+            Item={
+                'user_id': gacha_user_id,
+                'time_stamp': time_stamp,
+                'has_nas_num': has_nas_num,
+                'used_nas_num': used_nas_num,
+                'has_tickets': has_tickets
+            }
+        )
+        return True
+    except Exception as e:
+        print(e)
+        return False

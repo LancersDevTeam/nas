@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
 import sys
+import boto3
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -183,3 +185,98 @@ class TestNas():
         assert nas_obj.nas_message('test_user_B_id', 'test_user_B_name') is True
 
         assert nas_obj.nas_message('test_user_A_id', 'test_user_A_name') is False
+
+    def test_check_can_run_gacha(self, nas_gacha_db):
+        """Check to see if the gacha is available
+        The NAS takes 10 NAS to pull one time.
+        Use the NAS you've received so far.
+        Gacha costs 10 pieces by default to pull once.
+        Calculate that amount and check if you can roll the gacha.
+        The first time (when there is no nas_gacha record), it is always possible to draw once.
+
+        Returns:
+            bool: available is True. unavailable is False.
+        """
+        nas_obj_A = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+
+        # setup nas_db
+        os.environ['AWS_DEFAULT_REGION'] = 'ap-northeast-1'
+        dynamoDB = boto3.resource('dynamodb')
+        dynamoDB.create_table(
+            TableName='NAS',
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'tip_user_id',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'time_stamp',
+                    'AttributeType': 'N'
+                }
+            ],
+            KeySchema=[
+                {
+                    'AttributeName': 'tip_user_id',
+                    'KeyType': 'HASH'
+                },
+                {
+                    'AttributeName': 'time_stamp',
+                    'KeyType': 'RANGE'
+                },
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 15,
+                'WriteCapacityUnits': 5,
+            }
+        )
+
+        nas_db = dynamoDB.Table('NAS')
+        assert nas_obj_A.check_can_run_gacha() is True
+
+        now = datetime.now()
+        nas_gacha_item = {
+            'user_id': 'test_user_A_id',
+            'time_stamp': Decimal(now.timestamp()),
+            'has_nas_num': 10,
+            'used_nas_num': 0,
+            'has_tickets': {}
+        }
+        nas_gacha_db.put_item(Item=nas_gacha_item)
+        assert nas_obj_A.check_can_run_gacha() is False
+
+        now = datetime.now()
+        nas_item = {
+            'tip_user_id': 'test_user_B_id',
+            'time_stamp': Decimal(now.timestamp()),
+            'receive_user_id': 'test_user_A_id',
+            'receive_user_name': 'test_user_A_name',
+            'tip_type': 'stamp',
+            'tip_user_name': 'test_user_B_name',
+            'team_id': 'test_team_id'
+        }
+        nas_db.put_item(Item=nas_item)
+        assert nas_obj_A.check_can_run_gacha() is False
+
+        for i in range(10):
+            now = datetime.now()
+            nas_item = {
+                'tip_user_id': 'test_user_B_id',
+                'time_stamp': Decimal(now.timestamp()),
+                'receive_user_id': 'test_user_A_id',
+                'receive_user_name': 'test_user_A_name',
+                'tip_type': 'stamp',
+                'tip_user_name': 'test_user_B_name',
+                'team_id': 'test_team_id'
+            }
+            nas_db.put_item(Item=nas_item)
+        assert nas_obj_A.check_can_run_gacha() is True
+
+    def test_nas_gacha(self, nas_gacha_db):
+        """Function to roll Gacha and write the result
+        This function is used when the Gacha command is executed.
+        Gacha is designed so that the first time you play it, it's free.
+        The cost of one turn is 10 NAS received from someone else.
+        If you want to roll a gacha, you'll need to get an NAS from someone else.
+        """
+        nas_obj_A = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj_A.nas_gacha() is True

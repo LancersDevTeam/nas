@@ -3,7 +3,8 @@ import sys
 from datetime import datetime
 from decimal import Decimal
 
-from src.db import create_nas_record, load_send_nas_num, scan_nas_records
+from src.db import create_nas_record, load_send_nas_num, scan_nas_records, \
+    create_nas_gacha_record, load_latest_nas_gacha_record, scan_user_receive_nas_num
 from src.utils import get_ref_timestamp
 
 sys.path.append('../')
@@ -94,3 +95,82 @@ def test_create_nas_record(nas_db):
     assert load_send_nas_num('test_user_A_id', ref_timestamp) == 1
 
     assert load_send_nas_num('test_user_B_id', ref_timestamp) == 0
+
+
+def test_scan_user_receive_nas_num(nas_db):
+    """Aggregate all the NAS the user has received so far.
+    Aggregate all the NASs that have been received from other users so far.
+    It doesn't use what's on the record.
+    Returns the number of records sent to you.
+    You can't use query, so you can use scan.
+
+    Args:
+        scan_user_id: target user slack id
+
+    Return:
+        int: receive nas sum
+    """
+    assert scan_user_receive_nas_num('test_user_B_id') == 0
+    create_nas_record('test_user_A_id', 'test_user_A_name', 'test_user_B_id', 'test_user_B_name', 'stamp', 'test_team_id')
+    assert scan_user_receive_nas_num('test_user_B_id') == 1
+    create_nas_record('test_user_A_id', 'test_user_A_name', 'test_user_B_id', 'test_user_B_name', 'stamp', 'test_team_id')
+    create_nas_record('test_user_A_id', 'test_user_A_name', 'test_user_B_id', 'test_user_B_name', 'stamp', 'test_team_id')
+    assert scan_user_receive_nas_num('test_user_A_id') == 0
+    assert scan_user_receive_nas_num('test_user_B_id') == 3
+
+
+def test_load_latest_nas_gacha_record(nas_gacha_db):
+    """Retrieve the latest record of the target user.
+    The user record in nas_gacha is the most recent record representing the most recent state.
+    Along with that, when creating a new record or wanting to know the status of the user,
+    it is necessary to get the latest record.
+    This function does not return the contents of the record, but gets all the latest records.
+
+    Args:
+        gacha_user_id : The id of the user who wants to retrieve the latest record.
+
+    Return:
+        dict : latest record.
+    """
+
+    assert load_latest_nas_gacha_record('test_user_A_id') == {}
+
+    now = datetime.now()
+    create_nas_gacha_record('test_user_A_id', Decimal(now.timestamp()), 10, 0, {})
+    nas_gacha_record = {
+        'user_id': 'test_user_A_id',
+        'time_stamp': Decimal(now.timestamp()),
+        'has_nas_num': 10,
+        'used_nas_num': 0,
+        'has_tickets': {}
+    }
+    assert load_latest_nas_gacha_record('test_user_A_id') == nas_gacha_record
+
+    now = datetime.now()
+    create_nas_gacha_record('test_user_A_id', Decimal(now.timestamp()), 0, 10, {})
+    nas_gacha_record = {
+        'user_id': 'test_user_A_id',
+        'time_stamp': Decimal(now.timestamp()),
+        'has_nas_num': 0,
+        'used_nas_num': 10,
+        'has_tickets': {}
+    }
+    assert load_latest_nas_gacha_record('test_user_A_id') == nas_gacha_record
+
+
+def test_create_nas_gacha_record(nas_gacha_db):
+    """Create a nas_gacha record
+    The ability to turn the Gacha using the NAS you received.
+    A record is created each time, and the latest record of the target user indicates the current status.
+    Using a dynamo db called NAS_GACHA, which is separate from NAS.
+    Each gacha prize is saved in dictionary format.
+
+    Args:
+        gacha_user_id: executed nas gacha user id
+        time_stamp: the record created time stamp.
+        has_nas_num: Total value of the NAS we received.
+        used_nas_num: Already used nas for gacha.
+        has_tickets: The list of freebies that the user has at that time.
+    """
+    now = datetime.now()
+    assert create_nas_gacha_record('test_user_A_id', Decimal(now.timestamp()), 10, 0, {}) is True
