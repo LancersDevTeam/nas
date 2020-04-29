@@ -64,6 +64,29 @@ def create_nas_record(nas_user_id, nas_user_name, receive_user_id, receive_user_
         return False
 
 
+def scan_user_receive_nas_num(scan_user_id):
+    try:
+        dynamoDB = boto3.resource('dynamodb')
+        table = dynamoDB.Table('NAS')
+
+        response = table.scan(
+            FilterExpression=Key('receive_user_id').eq(scan_user_id)
+        )
+        nas_records = response['Items']
+
+        while 'LastEvaluatedKey' in response:
+            response = table.scan(
+                FilterExpression=Key('receive_user_id').eq(scan_user_id),
+                ExclusiveStartKey=response['LastEvaluatedKey']
+            )
+            nas_records.extend(response['Items'])
+
+        return len(nas_records)
+    except Exception as e:
+        print(e)
+        return 0
+
+
 def load_latest_nas_gacha_record(gacha_user_id):
     try:
         dynamoDB = boto3.resource('dynamodb')

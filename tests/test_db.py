@@ -3,7 +3,8 @@ import sys
 from datetime import datetime
 from decimal import Decimal
 
-from src.db import create_nas_record, load_send_nas_num, scan_nas_records, create_nas_gacha_record, load_latest_nas_gacha_record
+from src.db import create_nas_record, load_send_nas_num, scan_nas_records, \
+    create_nas_gacha_record, load_latest_nas_gacha_record, scan_user_receive_nas_num
 from src.utils import get_ref_timestamp
 
 sys.path.append('../')
@@ -94,6 +95,28 @@ def test_create_nas_record(nas_db):
     assert load_send_nas_num('test_user_A_id', ref_timestamp) == 1
 
     assert load_send_nas_num('test_user_B_id', ref_timestamp) == 0
+
+
+def test_scan_user_receive_nas_num(nas_db):
+    """Aggregate all the NAS the user has received so far.
+    Aggregate all the NASs that have been received from other users so far.
+    It doesn't use what's on the record.
+    Returns the number of records sent to you.
+    You can't use query, so you can use scan.
+
+    Args:
+        scan_user_id: target user slack id
+
+    Return:
+        int: receive nas sum
+    """
+    assert scan_user_receive_nas_num('test_user_B_id') == 0
+    create_nas_record('test_user_A_id', 'test_user_A_name', 'test_user_B_id', 'test_user_B_name', 'stamp', 'test_team_id')
+    assert scan_user_receive_nas_num('test_user_B_id') == 1
+    create_nas_record('test_user_A_id', 'test_user_A_name', 'test_user_B_id', 'test_user_B_name', 'stamp', 'test_team_id')
+    create_nas_record('test_user_A_id', 'test_user_A_name', 'test_user_B_id', 'test_user_B_name', 'stamp', 'test_team_id')
+    assert scan_user_receive_nas_num('test_user_A_id') == 0
+    assert scan_user_receive_nas_num('test_user_B_id') == 3
 
 
 def test_load_latest_nas_gacha_record(nas_gacha_db):
