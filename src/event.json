@@ -1,0 +1,38 @@
+{
+    "body": "token=SAMPLE_TOKEN&team_id=SAMPLE_TEAM_ID&team_domain=test&channel_id=SAMPLE_EVENT_CHANNEL_ID&channel_name=SAMPLE_EVENT_CHANNEL_NAME&user_id=SAMPLE_USER_ID&user_name=SAMPLE_USER_NAME&command=/nas!&text=test&response_url=https://hooks.slack.com/commands/sample",
+    "params": {
+        "path": {},
+        "querystring": {},
+        "header": {
+            "Accept": "application/json,*/*",
+            "Accept-Encoding": "gzip,deflate",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Host": "example.com",
+            "User-Agent": "Slackbot 1.0 (+https://api.slack.com/robots)",
+            "X-Amzn-Trace-Id": "Root=1-11111",
+            "X-Forwarded-Port": "443",
+            "X-Forwarded-Proto": "https",
+            "X-Slack-Request-Timestamp": "1588257865",
+            "X-Slack-Signature": "v0=sample"
+        }
+    },
+    "stage-variables": {},
+    "context": {
+        "account-id": "",
+        "api-id": "SAMPLE_APP_ID",
+        "api-key": "",
+        "authorizer-principal-id": "",
+        "caller": "",
+        "cognito-authentication-provider": "",
+        "cognito-authentication-type": "",
+        "cognito-identity-id": "",
+        "cognito-identity-pool-id": "",
+        "http-method": "POST",
+        "stage": "test",
+        "user": "",
+        "user-agent": "Slackbot 1.0 (+https://api.slack.com/robots)",
+        "user-arn": "",
+        "request-id": "SAMPLE_REQUEST_ID",
+        "resource-path": "/"
+    }
+}
