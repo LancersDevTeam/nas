@@ -13,6 +13,7 @@ v = {editable = true,version = "*"}
 moto = "*"
 pytest-mock = "*"
 pytest-env = "*"
+python-lambda-local = "*"
 
 [packages]
 setuptools = "*"
