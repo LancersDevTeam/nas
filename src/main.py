@@ -36,12 +36,13 @@ def main_func(event, content):
         # setup all need informations
         nas_user_id = parsed_event['user_id']
         nas_user_name = parsed_event['user_name']
-        sended_message = parsed_event['text'].split()
-        receive_user_name = sended_message[0].lstrip('@')
-        receive_user_id = bring_slack_id_from_slack_name(receive_user_name)
         team_id = parsed_event['team_id']
         sent_channel_id = parsed_event['channel_id']
         commend = parsed_event['command']
+        if commend == '/nas':
+            sended_message = parsed_event['text'].split()
+            receive_user_name = sended_message[0].lstrip('@')
+            receive_user_id = bring_slack_id_from_slack_name(receive_user_name)
 
     if commend == '/nas':
         # check can send nas message
@@ -85,4 +86,18 @@ def main_func(event, content):
 
         # create nas record
         nas_obj.nas_message(receive_user_id, receive_user_name)
+        return requests.codes.ok
+
+    if commend == '/nas_st':
+        nas_obj = Nas(nas_user_id, nas_user_name, team_id)
+
+        # setup slack text for send user
+        sended_nas_num = nas_obj.sended_nas_num()
+        remain_nas = NAS_LIMIT - sended_nas_num
+        nas_bonus = nas_obj.nas_bonus()
+        nas_status = nas_obj.nas_status()
+        send_user_slack_text = "今週の残りnas数: {0}\n先週からのボーナス: {1}\nあなたの残りnasは{2}です.".format(remain_nas, nas_bonus, nas_status)
+
+        # send nas message
+        post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
         return requests.codes.ok
