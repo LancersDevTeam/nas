@@ -72,3 +72,21 @@ def bring_slack_id_from_slack_name(user_name):
     except Exception as e:
         print(e)
         return ''
+
+
+def bring_slack_name_from_slack_id(user_id):
+    try:
+        slack_api_url = "https://slack.com/api/users.list"
+        slack_oauth_token = os.environ["SLACK_OAUTH_ACCESS_TOKEN"]
+
+        params = {'token': slack_oauth_token}
+        user_list = requests.get(slack_api_url, params=params).json()
+
+        for user in user_list["members"]:
+            if user_id == user['id']:
+                user_name = user['name']
+                break
+        return user_name
+    except Exception as e:
+        print(e)
+        return ''
