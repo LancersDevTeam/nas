@@ -27,7 +27,6 @@ def main_func(event, content):
     if 'X-Slack-Retry-Num' in event['params']['header']:
         print("this is redirect requests!")
         return 204
-    print('not retry process')
 
     content_type = type(event['body'])
 
@@ -64,7 +63,6 @@ def main_func(event, content):
             send_user_slack_text = 'そのユーザは存在しないよ！'
             post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
             return requests.codes.ok
-        print('check can send nas message')
 
         # forming message
         message = ""
