@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
 from decimal import Decimal
-from .db import scan_nas_records
+from db import scan_nas_records
 from collections import Counter
 import requests
 
@@ -62,8 +62,8 @@ def bring_slack_id_from_slack_name(user_name):
         slack_oauth_token = os.environ["SLACK_OAUTH_ACCESS_TOKEN"]
 
         params = {'token': slack_oauth_token}
-        user_list = requests.get(slack_api_url, params=params)
-        print(user_list)
+        user_list = requests.get(slack_api_url, params=params).json()
+
         for user in user_list["members"]:
             if user_name == user["name"]:
                 user_id = user['id']
