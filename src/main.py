@@ -31,7 +31,7 @@ def main_func(event, content):
 
     content_type = type(event['body'])
 
-    if content_type is str:  # nas message
+    if content_type is str:
         parsed_event = parse_lambda_event_str(event)
 
         # setup all need informations
@@ -42,7 +42,9 @@ def main_func(event, content):
         receive_user_id = bring_slack_id_from_slack_name(receive_user_name)
         team_id = parsed_event['team_id']
         sent_channel_id = parsed_event['channel_id']
+        commend = parsed_event['command']
 
+    if commend == '/nas':
         # check can send nas message
         nas_obj = Nas(nas_user_id, nas_user_name, team_id)
         if nas_obj.chack_self_portrait(receive_user_id) is True:
