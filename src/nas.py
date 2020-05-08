@@ -5,9 +5,9 @@ from decimal import Decimal
 from datetime import datetime
 from configparser import ConfigParser, ExtendedInterpolation
 
-from .db import create_nas_record, load_send_nas_num, scan_user_receive_nas_num, load_latest_nas_gacha_record, create_nas_gacha_record
-from .utils import get_last_week_ref_timestamp, get_ref_timestamp
-from .gacha import roll_a_gacha
+from db import create_nas_record, load_send_nas_num, scan_user_receive_nas_num, load_latest_nas_gacha_record, create_nas_gacha_record
+from utils import get_last_week_ref_timestamp, get_ref_timestamp
+from gacha import roll_a_gacha
 
 STAMP_CONFIG = ConfigParser(interpolation=ExtendedInterpolation())
 STAMP_CONFIG.read('./src/stamp_config.ini')
