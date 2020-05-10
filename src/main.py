@@ -43,8 +43,8 @@ def main_func(event, content):
         nas_user_name = parsed_event['user_name']
         team_id = parsed_event['team_id']
         sent_channel_id = parsed_event['channel_id']
-        commend = parsed_event['command']
-        if commend == '/nas':
+        command = parsed_event['command']
+        if command == '/nas':
             sended_message = parsed_event['text'].split()
             receive_user_name = sended_message[0].lstrip('@')
             receive_user_id = bring_slack_id_from_slack_name(receive_user_name)
@@ -58,9 +58,9 @@ def main_func(event, content):
         team_id = event['body']['team_id']
         sent_channel_id = event['body']['event']['item']['channel']
         send_stamp = event['body']['event']['reaction']
-        commend = '/nas_stamp'
+        command = '/nas_stamp'
 
-    if commend == '/nas':
+    if command == '/nas':
         # check can send nas message
         nas_obj = Nas(nas_user_id, nas_user_name, team_id)
         if nas_obj.chack_self_portrait(receive_user_id) is True:
@@ -104,7 +104,7 @@ def main_func(event, content):
         nas_obj.nas_message(receive_user_id, receive_user_name)
         return requests.codes.ok
 
-    if commend == '/nas_stamp':
+    if command == '/nas_stamp':
         nas_obj = Nas(nas_user_id, nas_user_name, team_id)
         if nas_obj.chack_self_portrait(receive_user_id) is True:
             print('self portrait')
@@ -143,7 +143,7 @@ def main_func(event, content):
         post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
         return requests.codes.ok
 
-    if commend == '/nas_rank':
+    if command == '/nas_rank':
         receive_all_nas_group_by_user = calc_nas_ranking_this_week()
         rank_count = 1
         send_user_slack_text = "今週のnasランキング\n順位 ユーザ名 貰ったnas数\n"
@@ -156,7 +156,7 @@ def main_func(event, content):
         post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
         return requests.codes.ok
 
-    if commend == '/nas_st':
+    if command == '/nas_st':
         nas_obj = Nas(nas_user_id, nas_user_name, team_id)
 
         # setup slack text for send user
@@ -170,7 +170,7 @@ def main_func(event, content):
         post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
         return requests.codes.ok
 
-    if commend == '/nas_gacha':
+    if command == '/nas_gacha':
         nas_obj = Nas(nas_user_id, nas_user_name, team_id)
         if nas_obj.check_can_run_gacha() is False:
             print("can't run nas gacha")
