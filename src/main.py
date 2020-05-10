@@ -204,3 +204,14 @@ def main_func(event, content):
         send_user_slack_text = "残りのガチャ回数は{0}回です\n回せるようになるまで{1}個のnasを受け取る必要があります".format(remain_nas_gacha, until_next_time_nas_num)
         # send nas message
         post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+    
+    if command == '/nas_gacha_tickets':
+        nas_obj = Nas(nas_user_id, nas_user_name, team_id)
+        has_tickets = nas_obj.check_nas_gacha_tickets()
+
+        send_user_slack_text = "持っているチケットリスト\n"
+        for prize_name, has_num in has_tickets.items():
+            send_user_slack_text += "{0} : {1} \n".format(prize_name, has_num)
+
+        # send nas message
+        post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
