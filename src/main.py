@@ -48,6 +48,8 @@ def main_func(event, content):
             sended_message = parsed_event['text'].split()
             receive_user_name = sended_message[0].lstrip('@')
             receive_user_id = bring_slack_id_from_slack_name(receive_user_name)
+        if command == '/use_nas_gacha_ticket':
+            use_ticket = parsed_event['text'].split()[0]
 
     if content_type is dict:
         # setup all need informations
@@ -204,7 +206,7 @@ def main_func(event, content):
         send_user_slack_text = "残りのガチャ回数は{0}回です\n回せるようになるまで{1}個のnasを受け取る必要があります".format(remain_nas_gacha, until_next_time_nas_num)
         # send nas message
         post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
-    
+
     if command == '/nas_gacha_tickets':
         nas_obj = Nas(nas_user_id, nas_user_name, team_id)
         has_tickets = nas_obj.check_nas_gacha_tickets()
@@ -215,3 +217,16 @@ def main_func(event, content):
 
         # send nas message
         post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+
+    if command == '/use_nas_gacha_ticket':
+        nas_obj = Nas(nas_user_id, nas_user_name, team_id)
+        result = nas_obj.use_nas_gacha_tickets(use_ticket)
+
+        if result is False:
+            send_user_slack_text = "チケットの消費に失敗しました。"
+            post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+            return requests.codes.ok
+
+        send_user_slack_text = "{0}のチケットを消費しました！".format(use_ticket)
+        post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+        return requests.codes.ok
