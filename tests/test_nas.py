@@ -468,7 +468,7 @@ class TestNas():
             'has_tickets': {'prize_1': 1}
         }
         nas_gacha_db.put_item(Item=nas_gacha_item)
-        assert nas_obj.calc_until_next_time_nas_num() == {'prize_1': 1}
+        assert nas_obj.check_nas_gacha_tickets() == {'prize_1': 1}
 
     def test_use_nas_gacha_tickets(self, nas_gacha_db):
         """Consume the tickets you have.
