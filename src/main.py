@@ -217,6 +217,7 @@ def main_func(event, content):
 
         # send nas message
         post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+        return requests.codes.ok
 
     if command == '/use_nas_gacha_ticket':
         nas_obj = Nas(nas_user_id, nas_user_name, team_id)
