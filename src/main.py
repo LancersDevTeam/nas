@@ -18,7 +18,7 @@ PUBLIC_NAS_CHANNEL_ID = os.environ['PUBLIC_NAS_CHANNEL_ID']
 
 def lambda_handler(event, content):
     threading.Thread(target=main_func(event, content))  # main process
-    threading.Thread(target=main_func(event, content))  # apparent process
+    threading.Thread(target=return_200())  # apparent process
 
 
 # If the response is slow, Slack will throw an error, so return 200 codes instantly.
