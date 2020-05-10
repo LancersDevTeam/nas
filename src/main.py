@@ -195,3 +195,12 @@ def main_func(event, content):
             post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
 
         return requests.codes.ok
+
+    if command == '/nas_gacha_status':
+        nas_obj = Nas(nas_user_id, nas_user_name, team_id)
+        remain_nas_gacha = nas_obj.nas_gacha_status()
+        until_next_time_nas_num = nas_obj.calc_until_next_time_nas_num()
+
+        send_user_slack_text = "残りのガチャ回数は{0}回です\n回せるようになるまで{1}個のnasを受け取る必要があります".format(remain_nas_gacha, until_next_time_nas_num)
+        # send nas message
+        post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
