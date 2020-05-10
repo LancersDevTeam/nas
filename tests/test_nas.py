@@ -446,7 +446,7 @@ class TestNas():
             str : Name of the prize you won
         """
         nas_obj_A = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
-        assert nas_obj_A.nas_gacha() is str
+        assert nas_obj_A.nas_gacha() in ['prize_1', 'prize_2', 'prize_3', 'prize_4', 'prize_5', '']
 
     def test_check_nas_gacha_tickets(self, nas_gacha_db):
         """Check the gacha prizes you've won
