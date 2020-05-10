@@ -97,6 +97,16 @@ class Nas:
 
         return True
 
+    def nas_gacha_status(self):
+        all_receive_nas_num = scan_user_receive_nas_num(self.user_id)
+        latest_nas_gacha_record = load_latest_nas_gacha_record(self.user_id)
+        if latest_nas_gacha_record == {}:
+            remain_nas_gacha = 1
+            return remain_nas_gacha
+
+        remain_nas_gacha = int((all_receive_nas_num - int(latest_nas_gacha_record['used_nas_num']))/NAS_GACHA_COST)
+        return remain_nas_gacha
+
     def nas_gacha(self):
         now = datetime.now()
         all_receive_nas_num = scan_user_receive_nas_num(self.user_id)
