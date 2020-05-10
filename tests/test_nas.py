@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
-import sys
 import boto3
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 from src.nas import Nas
 
-sys.path.append('../')
 NAS_GACHA_COST = int(os.environ['NAS_GACHA_COST'])
 
 

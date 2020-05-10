@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys
-
 from src.send_message import post_public_message_to_slack, post_private_message_to_slack
-
-sys.path.append('../')
 
 
 def test_post_public_message_to_slack(mocker):

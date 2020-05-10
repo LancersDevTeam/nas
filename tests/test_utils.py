@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
 import time
 from datetime import datetime
 from decimal import Decimal
@@ -7,8 +6,6 @@ import json
 
 from src.utils import get_last_week_ref_timestamp, get_ref_timestamp,\
     calc_nas_ranking_this_week, bring_slack_id_from_slack_name, bring_slack_name_from_slack_id
-
-sys.path.append('../')
 
 
 def test_get_ref_timestamp():
