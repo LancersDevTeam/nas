@@ -2,6 +2,7 @@
 import os
 import threading
 import requests
+import time
 
 from utils import parse_lambda_event_str, bring_slack_id_from_slack_name, bring_slack_name_from_slack_id, calc_nas_ranking_this_week
 from nas import Nas
@@ -167,4 +168,30 @@ def main_func(event, content):
 
         # send nas message
         post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+        return requests.codes.ok
+
+    if commend == '/nas_gacha':
+        nas_obj = Nas(nas_user_id, nas_user_name, team_id)
+        if nas_obj.check_can_run_gacha() is False:
+            print("can't run nas gacha")
+            send_user_slack_text = 'ガチャの残り回数がもう無いよ！もっとnasを貰ってきてね。'
+            post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+            return requests.codes.ok
+
+        send_user_slack_text = "デュルデュルデュルデュル..."
+        post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+
+        gacha_result = nas_obj.nas_gacha()
+        time.sleep(3)
+
+        # setup slack text for send user
+        remain_nas_gacha = nas_obj.nas_gacha_status()
+        if gacha_result != '':
+            send_user_slack_text = "ドン！今回の結果はあたりでした！\n当たった景品 {0}\n残りのガチャ回数は{1}回です".format(gacha_result, remain_nas_gacha)
+            # send nas message
+            post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+        else:
+            send_user_slack_text = "ドン！今回の結果ははずれでした！\n残りのガチャ回数は{0}回です".format(remain_nas_gacha)
+            post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+
         return requests.codes.ok
