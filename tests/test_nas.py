@@ -433,7 +433,7 @@ class TestNas():
                 'team_id': 'test_team_id'
             }
             nas_db.put_item(Item=nas_item)
-        assert nas_obj_A.nas_gacha_status() == 0
+        assert nas_obj_A.calc_until_next_time_nas_num() == 0
 
     def test_nas_gacha(self, nas_gacha_db):
         """Function to roll Gacha and write the result
