@@ -469,3 +469,31 @@ class TestNas():
         }
         nas_gacha_db.put_item(Item=nas_gacha_item)
         assert nas_obj.calc_until_next_time_nas_num() == {'prize_1': 1}
+
+    def test_use_nas_gacha_tickets(self, nas_gacha_db):
+        """Consume the tickets you have.
+        Consume giveaways won in Gacha.
+        False is returned if the item or record does not exist.
+        If the remaining number of giveaways in your possession reaches 0, you will be removed from the ticket list
+
+        Args:
+            ticket_name : Name of the ticket you want to use
+
+        Return:
+            bool : success or fail
+        """
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.use_nas_gacha_tickets('prize_1') is False
+
+        now = datetime.now()
+        nas_gacha_item = {
+            'user_id': 'test_user_A_id',
+            'time_stamp': Decimal(now.timestamp()),
+            'has_nas_num': 0,
+            'used_nas_num': 0,
+            'has_tickets': {'prize_1': 1}
+        }
+        nas_gacha_db.put_item(Item=nas_gacha_item)
+        assert nas_obj.use_nas_gacha_tickets('prize_1') is True
+
+        assert nas_obj.use_nas_gacha_tickets('prize_1') is False

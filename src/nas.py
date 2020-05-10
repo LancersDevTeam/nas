@@ -147,3 +147,24 @@ class Nas:
 
         ticket_dict = latest_nas_gacha_record['has_tickets']
         return ticket_dict
+
+    def use_nas_gacha_tickets(self, ticket_name):
+        latest_nas_gacha_record = load_latest_nas_gacha_record(self.user_id)
+        if latest_nas_gacha_record == {}:
+            print('empty gacha record')
+            return False
+
+        has_tickets = latest_nas_gacha_record['has_tickets']
+        if ticket_name not in has_tickets.keys():
+            print('not exist the ticket in your has tickets')
+            return False
+
+        now = datetime.now()
+        all_receive_nas_num = scan_user_receive_nas_num(self.user_id)
+        already_used_nas_num = latest_nas_gacha_record['used_nas_num']
+        has_tickets[ticket_name] -= 1
+
+        if has_tickets[ticket_name] <= 0:
+            del has_tickets[ticket_name]
+
+        create_nas_gacha_record(self.user_id, Decimal(now.timestamp()), all_receive_nas_num, already_used_nas_num, has_tickets)
