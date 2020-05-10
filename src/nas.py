@@ -98,9 +98,6 @@ class Nas:
         return True
 
     def nas_gacha(self):
-        if self.check_can_run_gacha() is False:
-            return False
-
         now = datetime.now()
         all_receive_nas_num = scan_user_receive_nas_num(self.user_id)
         latest_nas_gacha_record = load_latest_nas_gacha_record(self.user_id)
@@ -118,4 +115,4 @@ class Nas:
                 has_tickets[gacha_result] = has_tickets.get(gacha_result, 0) + 1
 
         create_nas_gacha_record(self.user_id, Decimal(now.timestamp()), all_receive_nas_num, already_used_nas_num, has_tickets)
-        return True
+        return gacha_result
