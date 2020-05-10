@@ -10,7 +10,7 @@ from utils import get_last_week_ref_timestamp, get_ref_timestamp
 from gacha import roll_a_gacha
 
 STAMP_CONFIG = ConfigParser(interpolation=ExtendedInterpolation())
-STAMP_CONFIG.read('./src/stamp_config.ini')
+STAMP_CONFIG.read('stamp_config.ini')
 
 NAS_LIMIT = int(os.environ['NAS_LIMIT'])
 NAS_GACHA_COST = int(os.environ['NAS_GACHA_COST'])
