@@ -138,3 +138,12 @@ class Nas:
 
         create_nas_gacha_record(self.user_id, Decimal(now.timestamp()), all_receive_nas_num, already_used_nas_num, has_tickets)
         return gacha_result
+
+    def check_nas_gacha_tickets(self):
+        latest_nas_gacha_record = load_latest_nas_gacha_record(self.user_id)
+        if latest_nas_gacha_record == {}:
+            ticket_dict = {}
+            return ticket_dict
+
+        ticket_dict = latest_nas_gacha_record['has_tickets']
+        return ticket_dict

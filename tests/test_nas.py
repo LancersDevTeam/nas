@@ -447,3 +447,25 @@ class TestNas():
         """
         nas_obj_A = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
         assert nas_obj_A.nas_gacha() is str
+
+    def test_check_nas_gacha_tickets(self, nas_gacha_db):
+        """Check the gacha prizes you've won
+        Check the list of giveaways you've won by rolling the Gacha.
+        Bring the list of tickets stored in dict format from the latest record.
+
+        Return:
+            dict: has tickets dict
+        """
+        nas_obj = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+        assert nas_obj.check_nas_gacha_tickets() == {}
+
+        now = datetime.now()
+        nas_gacha_item = {
+            'user_id': 'test_user_A_id',
+            'time_stamp': Decimal(now.timestamp()),
+            'has_nas_num': 0,
+            'used_nas_num': 0,
+            'has_tickets': {'prize_1': 1}
+        }
+        nas_gacha_db.put_item(Item=nas_gacha_item)
+        assert nas_obj.calc_until_next_time_nas_num() == {'prize_1': 1}
