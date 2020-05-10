@@ -107,6 +107,18 @@ class Nas:
         remain_nas_gacha = int((all_receive_nas_num - int(latest_nas_gacha_record['used_nas_num']))/NAS_GACHA_COST)
         return remain_nas_gacha
 
+    def calc_until_next_time_nas_num(self):
+        all_receive_nas_num = scan_user_receive_nas_num(self.user_id)
+        latest_nas_gacha_record = load_latest_nas_gacha_record(self.user_id)
+        if latest_nas_gacha_record == {}:
+            until_next_time_nas_num = 0
+            return until_next_time_nas_num
+
+        diff_remain_used_num = all_receive_nas_num - int(latest_nas_gacha_record['used_nas_num'])
+
+        until_next_time_nas_num = NAS_GACHA_COST - diff_remain_used_num if diff_remain_used_num < NAS_GACHA_COST else 0
+        return until_next_time_nas_num
+
     def nas_gacha(self):
         now = datetime.now()
         all_receive_nas_num = scan_user_receive_nas_num(self.user_id)

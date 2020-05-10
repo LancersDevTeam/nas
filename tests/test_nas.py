@@ -8,6 +8,7 @@ from decimal import Decimal
 from src.nas import Nas
 
 sys.path.append('../')
+NAS_GACHA_COST = int(os.environ['NAS_GACHA_COST'])
 
 
 class TestNas():
@@ -347,7 +348,7 @@ class TestNas():
             'has_tickets': {}
         }
         nas_gacha_db.put_item(Item=nas_gacha_item)
-        assert nas_obj_A.check_can_run_gacha() == 0
+        assert nas_obj_A.nas_gacha_status() == 0
 
         for i in range(10):
             now = datetime.now()
@@ -361,7 +362,78 @@ class TestNas():
                 'team_id': 'test_team_id'
             }
             nas_db.put_item(Item=nas_item)
-        assert nas_obj_A.check_can_run_gacha() == 1
+        assert nas_obj_A.nas_gacha_status() == 1
+
+    def test_calc_until_next_time_nas_num(self, nas_gacha_db):
+        """Calculate how many NAS you need to receive before you roll the NAS gacha
+        If you can't roll the gacha, calculate how many NAS you need to receive so you can do it next time.
+        If there is no record, you can turn it, so it is set to 0.
+        It is assumed that no more than the number received can be used.
+        Therefore, there is no case where the difference between the NAS you have and the NAS you used becomes negative.
+
+        Return:
+            int: How many NAS you need before you can turn the NAS gacha
+        """
+        nas_obj_A = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
+
+        # setup nas_db
+        os.environ['AWS_DEFAULT_REGION'] = 'ap-northeast-1'
+        dynamoDB = boto3.resource('dynamodb')
+        dynamoDB.create_table(
+            TableName='NAS',
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'tip_user_id',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'time_stamp',
+                    'AttributeType': 'N'
+                }
+            ],
+            KeySchema=[
+                {
+                    'AttributeName': 'tip_user_id',
+                    'KeyType': 'HASH'
+                },
+                {
+                    'AttributeName': 'time_stamp',
+                    'KeyType': 'RANGE'
+                },
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 15,
+                'WriteCapacityUnits': 5,
+            }
+        )
+
+        nas_db = dynamoDB.Table('NAS')
+        assert nas_obj_A.calc_until_next_time_nas_num() == 0
+
+        now = datetime.now()
+        nas_gacha_item = {
+            'user_id': 'test_user_A_id',
+            'time_stamp': Decimal(now.timestamp()),
+            'has_nas_num': 0,
+            'used_nas_num': 0,
+            'has_tickets': {}
+        }
+        nas_gacha_db.put_item(Item=nas_gacha_item)
+        assert nas_obj_A.calc_until_next_time_nas_num() == NAS_GACHA_COST
+
+        for i in range(NAS_GACHA_COST):
+            now = datetime.now()
+            nas_item = {
+                'tip_user_id': 'test_user_B_id',
+                'time_stamp': Decimal(now.timestamp()),
+                'receive_user_id': 'test_user_A_id',
+                'receive_user_name': 'test_user_A_name',
+                'tip_type': 'stamp',
+                'tip_user_name': 'test_user_B_name',
+                'team_id': 'test_team_id'
+            }
+            nas_db.put_item(Item=nas_item)
+        assert nas_obj_A.nas_gacha_status() == 0
 
     def test_nas_gacha(self, nas_gacha_db):
         """Function to roll Gacha and write the result
