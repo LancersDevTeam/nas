@@ -3,9 +3,13 @@ import os
 import threading
 import requests
 
-from utils import parse_lambda_event_str, bring_slack_id_from_slack_name
+from utils import parse_lambda_event_str, bring_slack_id_from_slack_name, bring_slack_name_from_slack_id
 from nas import Nas
 from send_message import post_public_message_to_slack, post_private_message_to_slack
+from configparser import ConfigParser, ExtendedInterpolation
+
+STAMP_CONFIG = ConfigParser(interpolation=ExtendedInterpolation())
+STAMP_CONFIG.read('stamp_config.ini')
 
 NAS_LIMIT = int(os.environ['NAS_LIMIT'])
 PUBLIC_NAS_CHANNEL_ID = os.environ['PUBLIC_NAS_CHANNEL_ID']
@@ -43,6 +47,17 @@ def main_func(event, content):
             sended_message = parsed_event['text'].split()
             receive_user_name = sended_message[0].lstrip('@')
             receive_user_id = bring_slack_id_from_slack_name(receive_user_name)
+
+    if content_type is dict:
+        # setup all need informations
+        nas_user_id = event['body']['event']['user']
+        nas_user_name = bring_slack_name_from_slack_id(nas_user_id)
+        receive_user_id = event['body']['event']['item_user']
+        receive_user_name = bring_slack_name_from_slack_id(receive_user_id)
+        team_id = event['body']['team_id']
+        sent_channel_id = event['body']['event']['item']['channel']
+        send_stamp = event['body']['event']['reaction']
+        commend = '/nas_stamp'
 
     if commend == '/nas':
         # check can send nas message
@@ -86,6 +101,45 @@ def main_func(event, content):
 
         # create nas record
         nas_obj.nas_message(receive_user_id, receive_user_name)
+        return requests.codes.ok
+
+    if commend == '/nas_stamp':
+        nas_obj = Nas(nas_user_id, nas_user_name, team_id)
+        if nas_obj.chack_self_portrait(receive_user_id) is True:
+            print('self portrait')
+            send_user_slack_text = '自画自賛乙'
+            post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+            return requests.codes.ok
+
+        if nas_obj.check_can_send_nas() is False:
+            print('nas send limit')
+            send_user_slack_text = '今週はもうnasを送れないよ！'
+            post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+            return requests.codes.ok
+
+        # set write user info
+        STAMP_CONFIG.set('user_info', 'nas_user_id', nas_user_id)
+        STAMP_CONFIG.set('user_info', 'nas_user_name', nas_user_name)
+        STAMP_CONFIG.set('user_info', 'receive_user_id', receive_user_id)
+        STAMP_CONFIG.set('user_info', 'receive_user_name', receive_user_name)
+
+        if nas_obj.nas_stamp(receive_user_id, receive_user_name, send_stamp) is False:
+            return requests.codes.ok
+
+        # setup slack text for send user
+        sended_nas_num = nas_obj.sended_nas_num()
+        remain_nas = NAS_LIMIT - sended_nas_num
+        nas_bonus = nas_obj.nas_bonus()
+        nas_status = nas_obj.nas_status()
+        send_user_slack_text = STAMP_CONFIG[send_stamp]['confirm_message'] + \
+            "\n今週の残りnas数: {0}\n先週からのボーナス: {1}\nあなたの残りnasは{2}です.".format(remain_nas, nas_bonus, nas_status)
+
+        # setup slack text for receive user
+        receive_user_slack_text = STAMP_CONFIG[send_stamp]['send_message']
+
+        # send nas message
+        post_private_message_to_slack(receive_user_slack_text, PUBLIC_NAS_CHANNEL_ID, receive_user_id)  # for receive user
+        post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
         return requests.codes.ok
 
     if commend == '/nas_st':
