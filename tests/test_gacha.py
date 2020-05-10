@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys
-
 from src.gacha import select_prize, roll_a_gacha
-
-sys.path.append('../')
 
 
 def test_select_prize():

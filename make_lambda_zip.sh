@@ -2,7 +2,8 @@
 
 rm -rf dist  
 mkdir dist  
-cp -r src/* dist  
+cp -r src/* dist
+cp stamp_config.ini dist  
 pipenv lock -r > requirements.txt  
 pip install -r requirements.txt -t dist  
 cd dist  

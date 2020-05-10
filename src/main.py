@@ -21,6 +21,7 @@ def lambda_handler(event, content):
     # If the response is slow, Slack will throw an error, so return instantly.
     return 0
 
+
 def main_func(event, content):
     # Ignore the retry process from Slack
     if 'X-Slack-Retry-Num' in event['params']['header']:

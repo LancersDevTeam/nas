@@ -168,3 +168,4 @@ class Nas:
             del has_tickets[ticket_name]
 
         create_nas_gacha_record(self.user_id, Decimal(now.timestamp()), all_receive_nas_num, already_used_nas_num, has_tickets)
+        return True

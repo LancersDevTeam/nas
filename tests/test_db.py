@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-import sys
 from datetime import datetime
 from decimal import Decimal
 
 from src.db import create_nas_record, load_send_nas_num, scan_nas_records, \
     create_nas_gacha_record, load_latest_nas_gacha_record, scan_user_receive_nas_num
 from src.utils import get_ref_timestamp
-
-sys.path.append('../')
 
 
 def test_load_send_nas_num(nas_db):

@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
-import sys
 import boto3
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 from src.nas import Nas
 
-sys.path.append('../')
 NAS_GACHA_COST = int(os.environ['NAS_GACHA_COST'])
 
 
@@ -433,7 +431,7 @@ class TestNas():
                 'team_id': 'test_team_id'
             }
             nas_db.put_item(Item=nas_item)
-        assert nas_obj_A.nas_gacha_status() == 0
+        assert nas_obj_A.calc_until_next_time_nas_num() == 0
 
     def test_nas_gacha(self, nas_gacha_db):
         """Function to roll Gacha and write the result
@@ -446,7 +444,7 @@ class TestNas():
             str : Name of the prize you won
         """
         nas_obj_A = Nas('test_user_A_id', 'test_user_A_name', 'test_team_id')
-        assert nas_obj_A.nas_gacha() is str
+        assert nas_obj_A.nas_gacha() in ['prize_1', 'prize_2', 'prize_3', 'prize_4', 'prize_5', '']
 
     def test_check_nas_gacha_tickets(self, nas_gacha_db):
         """Check the gacha prizes you've won
@@ -468,7 +466,7 @@ class TestNas():
             'has_tickets': {'prize_1': 1}
         }
         nas_gacha_db.put_item(Item=nas_gacha_item)
-        assert nas_obj.calc_until_next_time_nas_num() == {'prize_1': 1}
+        assert nas_obj.check_nas_gacha_tickets() == {'prize_1': 1}
 
     def test_use_nas_gacha_tickets(self, nas_gacha_db):
         """Consume the tickets you have.
