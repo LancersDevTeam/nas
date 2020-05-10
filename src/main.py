@@ -3,7 +3,7 @@ import os
 import threading
 import requests
 
-from utils import parse_lambda_event_str, bring_slack_id_from_slack_name, bring_slack_name_from_slack_id
+from utils import parse_lambda_event_str, bring_slack_id_from_slack_name, bring_slack_name_from_slack_id, calc_nas_ranking_this_week
 from nas import Nas
 from send_message import post_public_message_to_slack, post_private_message_to_slack
 from configparser import ConfigParser, ExtendedInterpolation
@@ -139,6 +139,19 @@ def main_func(event, content):
 
         # send nas message
         post_private_message_to_slack(receive_user_slack_text, PUBLIC_NAS_CHANNEL_ID, receive_user_id)  # for receive user
+        post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
+        return requests.codes.ok
+
+    if commend == '/nas_rank':
+        receive_all_nas_group_by_user = calc_nas_ranking_this_week()
+        rank_count = 1
+        send_user_slack_text = "今週のnasランキング\n順位 ユーザ名 貰ったnas数\n"
+
+        # setup slack text for send user
+        for user_name, receive_nas in receive_all_nas_group_by_user.items():
+            send_user_slack_text += str(rank_count) + ". " + str(user_name) + "\t" + str(receive_nas) + "\n"
+            rank_count += 1
+
         post_private_message_to_slack(send_user_slack_text, sent_channel_id, nas_user_id)  # for send user
         return requests.codes.ok
 
